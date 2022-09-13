@@ -7,9 +7,9 @@ def train(x_train, x_test, y_train, y_test):
     model = keras.Sequential(
         [
             keras.Input(shape=input_shape),
-            layers.Dense(256, activation='relu'),
+            layers.Dense(512, activation='relu'),
             layers.Dropout(0.5),
-            layers.Dense(128, activation='relu'),
+            layers.Dense(256, activation='relu'),
             layers.Dropout(0.5),
             layers.Dense(64, activation='relu'),
             layers.Dropout(0.5),

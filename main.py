@@ -1,7 +1,7 @@
 from train_op import train
 from data_op import load_data
 from model_op import get_model, save_model
-from neuron_op import neuron_coverage, k_multi_section_coverage, contribution_coverage, multi_layer_coverage
+from neuron_op import *
 from visual_op import coverage_line
 from utils import tok
 
@@ -24,9 +24,12 @@ if __name__ == '__main__':
     tok()
     coverage4 = multi_layer_coverage(model, x_test)
     tok()
+    coverage5 = multi_layer_section_coverage(model, x_train, x_test)
+    tok()
     coverage_line({
-        'neuron coverage': coverage1,
-        'k-multisection': coverage2,
-        'contribution': coverage3,
-        'multi-layer-coverage': coverage4
+        'neuron-coverage': coverage1,
+        'k-multi-section-coverage': coverage2,
+        'contribution-coverage': coverage3,
+        'multi-layer-coverage': coverage4,
+        'multi-layer-section-coverage': coverage5
     })
