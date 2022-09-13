@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 
 
 def coverage_line(coverages):
-    x = [i+1 for i in range(len(coverages[0]))]
-    for cov in coverages:
-        plt.plot(x, cov)
+    for name in coverages:
+        cov = coverages[name]
+        x = [i+1 for i in range(len(cov))]
+        plt.plot(x, cov, label=name)
+        plt.legend()
     plt.show()
