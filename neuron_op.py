@@ -70,6 +70,46 @@ def k_multi_section_coverage(model, train, test, k=5):
     return coverage
 
 
+def k_multi_section_coverage_loop(model, train, test, k=5):
+    outputs = get_output(model, train)
+    layer_max = []
+    layer_min = []
+
+    for layer in outputs:
+        layer_numpy = layer.numpy()
+        max_val, min_val = layer_numpy.max(axis=0), layer_numpy.min(axis=0)
+        const_ind = (max_val-min_val) == 0  # avoid divide by 0 exception
+        max_val[const_ind] = 1
+        min_val[const_ind] = 0
+        layer_max.append(layer_numpy.max(axis=0))
+        layer_min.append(layer_numpy.min(axis=0))
+
+    outputs = get_output(model, test)
+    n_samples = outputs[0].shape[0]
+    cum_count = np.array([0. for _ in range(n_samples)])
+    total_count = 0
+    for i, layer in enumerate(outputs):
+        layer_numpy = layer.numpy()
+        n_neurons = layer_numpy.shape[1]
+        max_val, min_val = layer_max[i], layer_min[i]
+        bins = ((layer_numpy-min_val)/(max_val-min_val)*k).astype('int')
+        corners = (bins < 0) | (bins >= k)
+        bins[corners] = 0
+        counter = np.zeros([n_neurons, k], dtype=bool)
+        ind = [_ for _ in range(n_neurons)]
+        for j, b in enumerate(bins):
+            local_counter = np.zeros_like(counter, dtype=bool)
+            local_counter[ind, b] = True
+            local_counter[corners[i]] = False
+            counter |= local_counter
+            cum_count[j] += counter.sum()
+        total_count += layer_numpy.shape[1]*k
+
+    print('kMSC total:', total_count)
+    coverage = cum_count / total_count
+    return coverage
+
+
 def contribution_coverage(model, data, t=0.6):
     outputs = get_output(model, data)
     weights = get_weights(model)
